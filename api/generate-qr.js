@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     }
 
     const qrBuffer = await QRCode.toBuffer(data, {
-      type: 'png',
+      type: 'jpg',
       width: 1200,
       margin: 4,
       errorCorrectionLevel: 'H',
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
       }
     });
 
-    const logoPath = path.join(process.cwd(), 'public', 'company-logo.png');
+    const logoPath = path.join(process.cwd(), 'public', 'OIP.jpg');
     const logoFile = await fs.readFile(logoPath);
 
     const logoBuffer = await sharp(logoFile)
