@@ -1,0 +1,9 @@
+{
+  "name": "quality-qr-generator",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "qrcode": "^1.5.4",
+    "sharp": "^0.34.3"
+  }
+}
