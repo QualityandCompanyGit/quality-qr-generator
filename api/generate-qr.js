@@ -44,7 +44,7 @@ export default async function handler(req, res) {
         right: 18,
         background: '#FFFFFF'
       })
-      .png()
+      .jpg()
       .toBuffer();
 
     const finalQr = await sharp(qrBuffer)
@@ -54,10 +54,10 @@ export default async function handler(req, res) {
           gravity: 'centre'
         }
       ])
-      .png()
+      .jpg()
       .toBuffer();
 
-    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Content-Type', 'image/jpg');
     res.setHeader('Cache-Control', 'no-store');
     res.status(200).send(finalQr);
 
