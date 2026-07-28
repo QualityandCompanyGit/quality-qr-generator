@@ -1,0 +1,1 @@
+# quality-qr-generator
