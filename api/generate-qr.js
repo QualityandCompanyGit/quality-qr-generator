@@ -3,19 +3,20 @@ import sharp from 'sharp';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-export async function POST(request) {
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   try {
-    const body = await request.json();
-    const data = body?.data;
+    const { data } = req.body;
 
     if (!data || typeof data !== 'string') {
-      return Response.json(
-        { error: 'A valid data value is required.' },
-        { status: 400 }
-      );
+      return res.status(400).json({
+        error: 'A valid data value is required.'
+      });
     }
 
-    // Generate a reliable black-and-white QR code.
     const qrBuffer = await QRCode.toBuffer(data, {
       type: 'png',
       width: 1200,
@@ -27,15 +28,9 @@ export async function POST(request) {
       }
     });
 
-    const logoPath = path.join(
-      process.cwd(),
-      'public',
-      'company-logo.png'
-    );
-
+    const logoPath = path.join(process.cwd(), 'public', 'company-logo.png');
     const logoFile = await fs.readFile(logoPath);
 
-    // White backing protects the QR modules underneath the logo.
     const logoBuffer = await sharp(logoFile)
       .resize({
         width: 190,
@@ -62,23 +57,15 @@ export async function POST(request) {
       .png()
       .toBuffer();
 
-    return new Response(finalQr, {
-      status: 200,
-      headers: {
-        'Content-Type': 'image/png',
-        'Content-Disposition': 'inline; filename="employee-qr.png"',
-        'Cache-Control': 'no-store'
-      }
-    });
-  } catch (error) {
-    console.error(error);
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Cache-Control', 'no-store');
+    res.status(200).send(finalQr);
 
-    return Response.json(
-      {
-        error: 'QR generation failed.',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: 'QR generation failed.',
+      details: err.message
+    });
   }
 }
